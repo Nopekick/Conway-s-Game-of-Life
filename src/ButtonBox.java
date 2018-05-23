@@ -1,6 +1,8 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ButtonBox extends JPanel {
 	private LifeSquare[][] grid;
@@ -10,12 +12,14 @@ public class ButtonBox extends JPanel {
 	private JButton stop;
 	private JComboBox select;
 	
+	private Timer timer;
+	
 	public ButtonBox() {
-		start = new JButton("Next");
-		stop = new JButton("Stop simulation");
+		start = new JButton("Play");
+		stop = new JButton("Stop");
 		gen = new JLabel("0");
 		
-		String[] presets = {"Clear", "Glider", "Small Exploder", "Exploder", "Lightweight Spaceship", "Tumbler", "Gospel Glider Gun"};
+		String[] presets = {"Clear", "Glider", "Small Exploder", "Ten Cell Row", "Exploder", "Lightweight Spaceship", "Tumbler", "Gospel Glider Gun"};
 		select = new JComboBox(presets);
 		
 		 select.addActionListener(new ActionListener() {
@@ -30,6 +34,7 @@ public class ButtonBox extends JPanel {
 	               case "Lightweight Spaceship": lightweightSpaceship(); break;
 	               case "Tumbler": tumbler(); break;
 	               case "Gospel Glider Gun": gospelGliderGun(); break;
+	               case "Ten Cell Row": tenCellRow(); break;
 	               }
 	            }
 	        });
@@ -37,9 +42,16 @@ public class ButtonBox extends JPanel {
 		start.addActionListener( new ActionListener()
 		{
 		    @Override
-		    public void actionPerformed(ActionEvent e)
+		    public void actionPerformed(ActionEvent e) 
 		    {
-		    		generation();
+		    		timer = new Timer();
+			    	timer.scheduleAtFixedRate(new TimerTask() {
+			    		  @Override
+			    		  public void run() {
+			    				generation();
+			    		  }
+			    		}, 200, 200);
+			    
 		    }
 		});
 		
@@ -48,13 +60,13 @@ public class ButtonBox extends JPanel {
 		    @Override
 		    public void actionPerformed(ActionEvent e)
 		    {
-		       System.exit(0);
+		       timer.cancel();
 		    }
 		});
 		
 		add(start); 
-		add(select);
 		add(stop);
+		add(select);
 		add(gen);
 		setBorder(BorderFactory.createLineBorder(Color.black));
 	}
@@ -62,6 +74,15 @@ public class ButtonBox extends JPanel {
 	public void setGrid(LifeSquare[][] grid) {
 		this.grid = grid;
 	}
+	
+//	public void looper() throws InterruptedException {
+//		for(int i = 0; i < 100; i++) {
+//			generation();
+//			try {
+//				Thread.sleep(20);
+//			} catch(InterruptedException ie) {}
+//		}
+//	}
 	
 	public void generation(){
 		boolean[][] temp = new boolean[57][80];
@@ -134,6 +155,7 @@ public class ButtonBox extends JPanel {
 			}
 			}
 		gen.setText(" "+ (++numGen));
+		
 	}
 	
 	public void clear() {
